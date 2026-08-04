@@ -63,7 +63,8 @@ subroutine setpart(id,npart,npartoftype,xyzh,massoftype,vxyzu,polyk,gamma,hfact,
  use eos,          only:icooling,ishock_heating,ipdv_heating
  use kernel,       only:hfact_default
  use mpidomain,    only:i_belong
- use ptmass,       only:icreate_sinks,rho_crit,rho_crit_cgs,r_crit,h_acc,h_soft_sinksink,h_soft_sinkgas 
+ use ptmass,       only:icreate_sinks,rho_crit,rho_crit_cgs,r_crit,h_acc,h_soft_sinksink,h_soft_sinkgas
+ use ptmass, only: pin_sink,pin_all,isink_to_pin,r_merge_cond,r_merge_uncond 
  use cooling,      only:Tfloor
  use velfield,     only:set_velfield_from_cubes
  use datafiles,    only:find_phantom_datafile
@@ -303,22 +304,23 @@ subroutine setpart(id,npart,npartoftype,xyzh,massoftype,vxyzu,polyk,gamma,hfact,
     iexternalforce = 17  ! cluster potential
 
     !-- Dynamically create new sinks during runtime (allow star formation)
-    if (make_sinks) then 
+    !-- Dynamically create new sinks during runtime (allow star formation)
+    if (make_sinks) then
        icreate_sinks    = 1
-       h_acc            = 5.d0*au/udist
-       r_crit           = 5.d0*h_acc
-       rho_crit_cgs     = 5.d-16 
+       rho_crit_cgs     = 1.d-10
        rho_crit         = rho_crit_cgs/unit_density
+
+       h_acc            = 2.d0*hfact_default*(pmass/rho_crit)**(1.d0/3.d0)
+       r_crit           = 2.d0*h_acc
+
        h_soft_sinkgas   = h_acc
        h_soft_sinksink  = h_acc
-    else 
-       icreate_sinks    = 0
-    endif 
 
-    ! if (pin_cen_sink) then 
-    !   pin_sink         = .true. 
-    !  isink_to_pin     = 1
-    ! endif 
+       r_merge_cond     = 1.d-1*h_acc
+       r_merge_uncond   = 1.d-2*h_acc
+    else
+       icreate_sinks    = 0
+    endif
  endif 
 
 end subroutine setpart
