@@ -68,12 +68,13 @@ module externalforces
    iext_gwinspiral    = 14, &
    iext_discgravity   = 15, &
    iext_corot_binary  = 16, &
-   iext_geopot        = 17
+   iext_geopot        = 17, &
+   iext_starcluster   = 18
 
  !
  ! Human-readable labels for these
  !
- integer, parameter, public  :: iexternalforce_max = 17
+ integer, parameter, public  :: iexternalforce_max = 18
  character(len=*), parameter, public :: externalforcetype(iexternalforce_max) = (/ &
     'star                 ', &
     'corotate             ', &
@@ -91,7 +92,8 @@ module externalforces
     'grav. wave inspiral  ', &
     'disc gravity         ', &
     'corotating binary    ', &
-    'geopotential model   '/)
+    'geopotential model   ', &
+    'starcluster          '/)
 
 contains
 !-----------------------------------------------------------------------
@@ -113,6 +115,7 @@ subroutine externalforce(iexternalforce,xi,yi,zi,hi,ti,fextxi,fextyi,fextzi,phi,
  use extern_Bfield,      only:get_externalB_force
  use extern_staticsine,  only:staticsine_force
  use extern_gwinspiral,  only:get_gw_force_i
+ use extern_starcluster, only:starcluster_force
  use extern_geopot,      only:get_geopot_force,J2,spinvec
  use units,              only:get_G_code
  use io,                 only:fatal
@@ -390,7 +393,11 @@ subroutine externalforce(iexternalforce,xi,yi,zi,hi,ti,fextxi,fextyi,fextzi,phi,
     !
     pos = (/xi,yi,zi/)
     call get_centrifugal_force(pos,fextxi,fextyi,fextzi,phi)
-
+ case(iext_starcluster)
+    !
+    !--External force from stellar cluster potential
+    !
+    call starcluster_force(xi,yi,zi,fextxi,fextyi,fextzi,phi)
  case default
 !
 !--external forces should not be called if iexternalforce = 0
@@ -614,6 +621,7 @@ subroutine write_options_externalforces(iunit,iexternalforce)
  use extern_Bfield,        only:write_options_externB
  use extern_staticsine,    only:write_options_staticsine
  use extern_gwinspiral,    only:write_options_gwinspiral
+ use extern_starcluster,   only:write_options_starcluster
  use extern_geopot,        only:write_options_geopot
  integer, intent(in) :: iunit,iexternalforce
  character(len=80) :: string
@@ -658,6 +666,8 @@ subroutine write_options_externalforces(iunit,iexternalforce)
     call write_options_gwinspiral(iunit)
  case(iext_geopot)
     call write_options_geopot(iunit)
+ case(iext_starcluster)
+    call write_options_starcluster(iunit)
  end select
 
 end subroutine write_options_externalforces
@@ -723,6 +733,7 @@ subroutine read_options_externalforces(db,nerr,iexternalforce)
  use extern_Bfield,        only:read_options_externB
  use extern_staticsine,    only:read_options_staticsine
  use extern_gwinspiral,    only:read_options_gwinspiral
+ use extern_starcluster,   only:read_options_starcluster
  use extern_geopot,        only:read_options_geopot
  use infile_utils,         only:inopts,read_inopt
  type(inopts), intent(inout) :: db(:)
@@ -772,6 +783,8 @@ subroutine read_options_externalforces(db,nerr,iexternalforce)
     call read_options_gwinspiral(db,nerr)
  case(iext_geopot)
     call read_options_geopot(db,nerr)
+ case(iext_starcluster)
+    call read_options_starcluster(db,nerr)
  end select
 
 end subroutine read_options_externalforces
@@ -788,6 +801,7 @@ subroutine initialise_externalforces(iexternalforce,ierr)
  use extern_densprofile,   only:load_extern_densityprofile
  use extern_Bfield,        only:check_externB_settings
  use extern_gwinspiral,    only:initialise_gwinspiral
+ use extern_starcluster,   only:init_starcluster
  use units,                only:G_is_unity,c_is_unity,get_G_code,get_c_code
  use part,                 only:npart,nptmass
  integer, intent(in)  :: iexternalforce
@@ -803,6 +817,8 @@ subroutine initialise_externalforces(iexternalforce,ierr)
     call initialise_spiral(ierr)
  case(iext_densprofile)
     call load_extern_densityprofile(ierr)
+ case(iext_starcluster)
+    call init_starcluster(ierr)
  case (iext_gwinspiral)
     call initialise_gwinspiral(npart,nptmass,ierr)
     if (ierr > 0) then

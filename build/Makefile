@@ -445,6 +445,7 @@ SRCPOTS= extern_gr.f90 \
          extern_corotate.f90 \
          extern_binary.f90 \
          extern_spiral.f90 \
+         extern_starcluster.f90 \
          extern_lensethirring.f90 \
          extern_gnewton.f90 \
          extern_prdrag.f90 \

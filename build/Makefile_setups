@@ -1272,3 +1272,15 @@ ifeq ($(SETUP), amuse)
     DUST_NUCLEATION=yes
     INJECT_PARTICLES=yes
 endif
+ifeq ($(SETUP), binaryincluster)
+# Binary pair at the centre of a cluster
+    SETUPFILE=setup_binaryincluster.f90
+    PERIODIC=no
+    GRAVITY=yes
+    ISOTHERMAL=yes
+    IND_TIMESTEPS=yes
+    KNOWN_SETUP=yes
+    MAXP=6000000
+    NCELLSMAX=2*maxp
+endif
+
