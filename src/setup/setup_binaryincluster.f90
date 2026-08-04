@@ -63,8 +63,8 @@ subroutine setpart(id,npart,npartoftype,xyzh,massoftype,vxyzu,polyk,gamma,hfact,
  use eos,          only:icooling,ishock_heating,ipdv_heating
  use kernel,       only:hfact_default
  use mpidomain,    only:i_belong
- use ptmass,       only:icreate_sinks,rho_crit,rho_crit_cgs,r_crit,h_acc,h_soft_sinksink,h_soft_sinkgas
- use ptmass, only: pin_sink,pin_all,isink_to_pin,r_merge_cond,r_merge_uncond 
+ use ptmass,       only: icreate_sinks,rho_crit,rho_crit_cgs,r_crit,h_acc, &
+                   h_soft_sinksink,h_soft_sinkgas,r_merge_cond,r_merge_uncond 
  use cooling,      only:Tfloor
  use velfield,     only:set_velfield_from_cubes
  use datafiles,    only:find_phantom_datafile
