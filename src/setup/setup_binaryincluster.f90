@@ -60,6 +60,7 @@ subroutine setpart(id,npart,npartoftype,xyzh,massoftype,vxyzu,polyk,gamma,hfact,
  use io_control,   only:nout,nfulldump,nmaxdumps
  use centreofmass, only:reset_centreofmass
  use options,      only:iexternalforce
+ use externalforces, only: iext_starcluster
  use eos,          only:icooling,ishock_heating,ipdv_heating
  use kernel,       only:hfact_default
  use mpidomain,    only:i_belong
@@ -301,7 +302,7 @@ subroutine setpart(id,npart,npartoftype,xyzh,massoftype,vxyzu,polyk,gamma,hfact,
        ishock_heating = 1
     endif 
 
-    iexternalforce = 17  ! cluster potential
+    iexternalforce = iext_starcluster   ! stellar cluster potential
 
     !-- Dynamically create new sinks during runtime (allow star formation)
     !-- Dynamically create new sinks during runtime (allow star formation)
